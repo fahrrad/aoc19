@@ -2,7 +2,6 @@
   (:require [aoc19.core :as core]
             [clojure.edn :as edn]))
 
-
 ;; Part 1
 (defn fuel-requirement [m]
   (- (quot m 3) 2))
