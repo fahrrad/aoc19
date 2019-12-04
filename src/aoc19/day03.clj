@@ -1,6 +1,7 @@
 (ns aoc19.day03
   (:require [aoc19.core :as core]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [clojure.set :as set]))
 
 (defmulti next-point (fn [_ direction _] direction))
 
@@ -53,24 +54,36 @@
           [[0 0]]
           coordinates))
 
-(def l1-points
+(defn manhattan-distance [[x y]]
+  (+ (Math/abs x) (Math/abs y)))
+
+(def l1-set
   (let [[l1 _]
         (core/load-file "3")]
-    (coordinates-to-points
-     (directions-to-coordinates
-      (map parse-directions
-           (s/split l1 #","))))))
+    (into
+     #{}
+     (coordinates-to-points
+      (directions-to-coordinates
+       (map parse-directions
+            (s/split l1 #",")))))))
 
-(def l2-points
+(def l2-set
   (let [[_ l2]
         (core/load-file "3")]
-    (coordinates-to-points
-     (directions-to-coordinates
-      (map parse-directions
-           (s/split l2 #","))))))
+    (into
+     #{}
+     (coordinates-to-points
+      (directions-to-coordinates
+       (map parse-directions
+            (s/split l2 #",")))))))
 
 (def intersections
-  (max (for [p1 l1-points
-        p2 l2-points
-        :when (= p1 p2)]
-    p1))
+  (set/difference
+   (set/intersection l2-set l1-set)
+   #{[0 0]}))
+
+(def distances
+  (map manhattan-distance intersections))
+
+;; solution Part 1:
+(apply min distances)
