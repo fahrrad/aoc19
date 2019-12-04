@@ -57,25 +57,25 @@
 (defn manhattan-distance [[x y]]
   (+ (Math/abs x) (Math/abs y)))
 
+(def l1-points
+  (dedupe
+   (coordinates-to-points
+    (directions-to-coordinates
+     (map parse-directions
+          (s/split (first (core/load-file "3")) #","))))))
+
 (def l1-set
-  (let [[l1 _]
-        (core/load-file "3")]
-    (into
-     #{}
-     (coordinates-to-points
-      (directions-to-coordinates
-       (map parse-directions
-            (s/split l1 #",")))))))
+  (into #{} l1-points))
+
+(def l2-points
+  (dedupe
+   (coordinates-to-points
+    (directions-to-coordinates
+     (map parse-directions
+          (s/split (second (core/load-file "3")) #","))))))
 
 (def l2-set
-  (let [[_ l2]
-        (core/load-file "3")]
-    (into
-     #{}
-     (coordinates-to-points
-      (directions-to-coordinates
-       (map parse-directions
-            (s/split l2 #",")))))))
+  (into #{} l2-points))
 
 (def intersections
   (set/difference
@@ -87,3 +87,16 @@
 
 ;; solution Part 1:
 (apply min distances)
+
+;; solutions part2
+(def length-1
+  (map (fn [v] (.indexOf l1-points v)) intersections))
+
+(def length-2
+  (map (fn [v] (.indexOf l2-points v)) intersections))
+
+(def length-sums
+  (map + length-1 length-2))
+
+;;solution part 2:
+(apply min length-sums)
