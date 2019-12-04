@@ -1,4 +1,6 @@
-(ns aoc19.day03)
+(ns aoc19.day03
+  (:require [aoc19.core :as core]
+            [clojure.string :as s]))
 
 (defmulti next-point (fn [_ direction _] direction))
 
@@ -31,3 +33,44 @@
     (and (= x1 x2) (= y1 y2)) []
     :else (throw (IllegalArgumentException.
                   "No support for diagonal lines"))))
+
+(defn parse-directions [s]
+  {:direction (keyword
+               (subs s 0 1))
+   :length (Integer/parseInt (subs s 1))})
+
+(defn directions-to-coordinates [directions]
+  (reduce (fn [acc x] (conj acc (next-point
+                                 (last acc)
+                                 (:direction x)
+                                 (:length x))))
+          [[0 0]]
+          directions))
+
+(defn coordinates-to-points [coordinates]
+  (reduce (fn [acc x]
+            (into acc (points-between (last acc) x)))
+          [[0 0]]
+          coordinates))
+
+(def l1-points
+  (let [[l1 _]
+        (core/load-file "3")]
+    (coordinates-to-points
+     (directions-to-coordinates
+      (map parse-directions
+           (s/split l1 #","))))))
+
+(def l2-points
+  (let [[_ l2]
+        (core/load-file "3")]
+    (coordinates-to-points
+     (directions-to-coordinates
+      (map parse-directions
+           (s/split l2 #","))))))
+
+(def intersections
+  (max (for [p1 l1-points
+        p2 l2-points
+        :when (= p1 p2)]
+    p1))
